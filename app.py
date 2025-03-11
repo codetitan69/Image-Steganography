@@ -78,9 +78,12 @@ def encode_image():
 
         return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="image.png")
 
-@app.route('/decrypt')
+@app.route('/decrypt',methods=['GET','POST'])
 def decode_image():
-    return ""
+    if request.method == 'GET':
+        return render_template('decode_image.html')
+    elif request.method == 'POST':
+        return render_template('download.html')
 
 
 def encrypt(message: str, password: str) -> tuple:

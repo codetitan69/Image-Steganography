@@ -1,74 +1,96 @@
 {% extends 'base.html' %}
 
 {% block styles %}
-	<style>
-        *,*::after,*::before{
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-        }
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        font-family: Arial, sans-serif;
+        color: white;
+    }
 
-        body{
-            height: 100vh;
-            background-color: darkslategrey;
-        }
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+        width: 50%;
+    }
 
-        .container{
-            height: 100%;
+    h1 {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
 
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            flex-direction: column;
-        }
+    h3 {
+        font-size: 16px;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.5;
+        word-spacing: 1px;
+    }
 
-        a{
-            display: inline-block;
-            width: 100%;
-            background-color: darkgreen;
-            max-width: 150px;
-            text-align: center;
+    h3 a {
+        color: #ff7eb3;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.3s;
+        display: inline;
+    }
 
-            padding: 20px;
-            border-radius: 14px;
+    h3 a:hover {
+        color: #ff4f91;
+        text-decoration: underline;
+    }
 
-            color: lightseagreen;
-            text-decoration: none;
+    a {
+        display: inline-block;
+        width: 150px;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.3s;
+    }
 
-            cursor: pointer;
-        }
+    .encrypt {
+        background: #ff7eb3;
+        color: white;
+        margin-bottom: 15px;
+    }
 
-        a:active{
-            color: lightseagreen;
-            text-decoration: none;
-        }
+    .decrypt {
+        background: #4fc3f7;
+        color: white;
+    }
 
-        a:visited{
-            color: lightseagreen;
-            text-decoration: none;
-        }
+    .encrypt:hover {
+        background: #ff4f91;
+    }
 
-        h1,h3{
-            text-align: center;
-            color: snow;
-        }
-
-        h1{
-            margin: 30px;
-        }
-        h3{
-            margin: 60px 60px 80px 60px;
-        }
-
-        .encrypt{margin-bottom: 20px}
-
-    </style>
+    .decrypt:hover {
+        background: #1e88e5;
+    }
+</style>
 {% endblock %}
+
+
 
 {% block content %}
 	<div class="container">
         <h1>STEGANOGRAPHY</h1>
-        <h3>The technique of encoding messages in digital formats like images,audios,videos etc. using LSB(Least Significant Bit) encoding.</h3>
+        <h3>LSB encoding is used to hide your message in images.<br> Algorithms like AES, PBKDF, BASE64 etc. has been used for extra protection <a href="#">Click</a> to learn more.</h3>
         <a class="encrypt" href="{{ url_for('encode_image') }}">Encrypt</a>
         <a class="decrypt" href="{{ url_for('decode_image') }}">Decrypt</a>
     </div>
