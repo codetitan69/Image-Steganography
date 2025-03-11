@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+	<style>
+        *,*::after,*::before{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            height: 100vh;
+            background-color: darkslategrey;
+        }
+
+        .container{
+            height: 100%;
+
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        a{
+            display: inline-block;
+            width: 100%;
+            background-color: darkgreen;
+            max-width: 150px;
+            text-align: center;
+
+            padding: 20px;
+            border-radius: 14px;
+
+            color: lightseagreen;
+            text-decoration: none;
+
+            cursor: pointer;
+        }
+
+        a:active{
+            color: lightseagreen;
+            text-decoration: none;
+        }
+
+        a:visited{
+            color: lightseagreen;
+            text-decoration: none;
+        }
+
+        h1,h3{
+            text-align: center;
+            color: snow;
+        }
+
+        h1{
+            margin: 30px;
+        }
+        h3{
+            margin: 60px 60px 80px 60px;
+        }
+
+        .encrypt{margin-bottom: 20px}
+
+    </style>
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+        <h1>STEGANOGRAPHY</h1>
+        <h3>The technique of encoding messages in digital formats like images,audios,videos etc. using LSB(Least Significant Bit) encoding.</h3>
+        <a class="encrypt" href="{{ url_for('encode_image') }}">Encrypt</a>
+        <a class="decrypt" href="{{ url_for('decode_image') }}">Decrypt</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}
+    	Steganography
+    {% endblock %}</title>
+    <style>
+        *,*::after,*::before{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+    {% block styles %}
+
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+
+    {% endblock %}
+</body>
+</html>
