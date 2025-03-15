@@ -14,7 +14,10 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from base64 import b64encode, b64decode
-text_seperator = '\x1E'
+
+message_start = '\x02'
+message_end = '\x03'
+parts_seperator = '\x1E'
 
 app = Flask(__name__,template_folder='templates')
 
@@ -57,8 +60,7 @@ def encode_image():
         db.session.commit()
         data_id = encryption_data.id
 
-
-        encode_text = text_seperator+message_hash+text_seperator + cipher_text +text_seperator+b64encode(str(data_id).encode()).decode()+text_seperator
+        encode_text = message_start + parts_seperator + message_hash + parts_seperator + cipher_text + parts_seperator + data_id + parts_seperator + message_end
         binary_encode_text = ''.join(format(ord(c), '08b') for c in encode_text)
 
         flat_img_arr = ImgArr.ravel()
@@ -83,7 +85,65 @@ def decode_image():
     if request.method == 'GET':
         return render_template('decode_image.html')
     elif request.method == 'POST':
-        return render_template('download.html')
+
+        image_file = request.files['image']
+        user_key = request.form.get('key')
+
+        PilImage = Image.open(image_file).convert('RGB')
+        ImgArr = np.array(PilImage)
+
+        flatImgArr = ImgArr.ravel()
+
+        lsb_Arr = []
+
+        for i in flatImgArr:
+            if i & 1:
+                lsb_Arr.append(1)
+            else:
+                lsb_Arr.append(0)
+
+        print(lsb_Arr)
+
+        text_bytes = bytearray()
+        current_byte = 0
+        bit_count = 0
+        reading = False
+
+        for i in lsb_Arr:
+            current_byte = (current_byte << 1) | i
+            bit_count += 1
+
+            if bit_count == 8:
+                if current_byte == ord(message_start):
+                    reading = True
+                    bit_count = 0
+                    current_byte = 0
+                    continue
+
+                if current_byte == ord(message_end):
+                    break
+
+                if reading:
+                    text_bytes.append(current_byte)
+                    bit_count = 0
+                    current_byte = 0
+
+
+        hidden_text = text_bytes.decode('utf-8')
+        hidden_text_parts = hidden_text.split(parts_seperator)
+
+        cipher_text_hash = hidden_text_parts[1]
+        cipher_text = hidden_text_parts[2]
+        cipher_text_id = hidden_text_parts[3]
+
+        data = EncryptedData.query.filter(EncryptedData.id == cipher_text_id).first()
+        salt = data.salt
+        nonce = data.nonce
+        tag = data.tag
+
+        decoded_text = decrypt(cipher_text = cipher_text,salt=salt,nonce=nonce,tag=tag,password=user_key)
+
+        return render_template('download.html',decrypted_message = decoded_text)
 
 
 def encrypt(message: str, password: str) -> tuple:
@@ -100,6 +160,20 @@ def encrypt(message: str, password: str) -> tuple:
             b64encode(ciphertext).decode(),  # Convert encrypted message
             b64encode(encryptor.tag).decode())  # Authentication tag (ensures data integrity)
 
+def decrypt(cipher_text: str,salt: str,nonce: str,tag: str,password: str) -> str:
+    Salt = b64decode(salt)
+    Nonce = b64decode(nonce)
+    Tag = b64decode(tag)
+    Cipher_text = b64decode(cipher_text)
+
+    key = derive_key(password=password,salt=Salt)
+
+    cipher = Cipher(algorithms.AES(key), modes.GCM(Nonce, Tag))
+    decryptor = cipher.decryptor()
+    decrypted_message = decryptor.update(Cipher_text) + decryptor.finalize()
+
+    return decrypted_message.decode()
+
 
 def derive_key(password: str, salt: bytes) -> bytes:
     kdf = PBKDF2HMAC(
@@ -109,7 +183,6 @@ def derive_key(password: str, salt: bytes) -> bytes:
         iterations=100000,  # Slows down brute-force attacks
     )
     return kdf.derive(password.encode())  # Generate and return the key
-
 
 if __name__ == '__main__':
     app.run('0.0.0.0',debug=True)

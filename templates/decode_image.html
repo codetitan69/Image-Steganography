@@ -48,6 +48,7 @@
     input[type="file"] {
         background: white;
         padding: 10px;
+        color: black;
     }
 
     input[type="password"] {
@@ -83,7 +84,7 @@
     <h1>Decode Image</h1>
     <form action="{{ url_for('decode_image') }}" method="post" enctype="multipart/form-data">
         <label for="image">Select Image:</label>
-        <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/jpg" required>
+        <input type="file" id="image" name="image" accept="image/png" required onchange="">
 
         <label for="key">Enter Key (Min 12 Characters):</label>
         <input type="password" id="key" name="key" minlength="12" placeholder="Enter your secret key" required>
@@ -91,4 +92,16 @@
         <button type="submit">Submit</button>
     </form>
 </div>
+    <script>
+        function updateFileName() {
+            let input = document.getElementById("image");
+            let label = document.getElementById("file-label");
+            if (input.files.length > 0) {
+                label.textContent = input.files[0].name; // Display selected file name
+            } else {
+                label.textContent = "Select Image"; // Reset if no file is chosen
+            }
+        }
+    </script>
+
 {% endblock %}
